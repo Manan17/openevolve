@@ -362,7 +362,10 @@ def evaluate_stage1(program_path):
     First stage evaluation - quick validation check with a single size
     """
     # Use a single size for quick validation
-    test_sizes = [(32, 512, 4096, 32000)]  # Typical transformer size
+    test_sizes = [(32, 512, 4096, 32000),    # Typical transformer size
+        (64, 1024, 4096, 32000),   # Larger batch
+        (16, 2048, 4096, 32000),   # Longer sequence
+        (32, 512, 8192, 64000)]  # Typical transformer size
 
     try:
         # Load the program

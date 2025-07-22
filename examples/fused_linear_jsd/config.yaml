@@ -68,8 +68,3 @@ benchmark:
   hidden_size: 4096
   num_runs: 100
   warmup_runs: 10
-  test_sizes:
-    - [32, 512, 4096, 32000]    # Typical transformer size
-    - [64, 1024, 4096, 32000]   # Larger batch
-    - [16, 2048, 4096, 32000]   # Longer sequence
-    - [32, 512, 8192, 64000] 
