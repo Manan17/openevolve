@@ -22,7 +22,7 @@ llm:
       weight: 0.2
 
   # API configuration
-  api_base: "https://api.anthropic.com/v1"  # Base URL for API (change for non-OpenAI models)
+  api_base: "https://api.anthropic.com"  # Base URL for API (change for non-OpenAI models)
   api_key: null                       # API key (defaults to OPENAI_API_KEY env variable)
 
   # Generation parameters

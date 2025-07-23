@@ -25,7 +25,7 @@ class AnthropicLLM(LLMInterface):
         self.retries = model_cfg.retries
         self.retry_delay = model_cfg.retry_delay
         self.api_key = model_cfg.api_key
-        self.api_base = model_cfg.api_base or "https://api.anthropic.com/v1"
+        self.api_base = model_cfg.api_base or "https://api.anthropic.com"
         self.random_seed = getattr(model_cfg, "random_seed", None)
 
         # Set up API client
