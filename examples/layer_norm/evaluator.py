@@ -1,7 +1,7 @@
 """
 Evaluator for LayerNorm kernel optimization
 """
-
+import multiprocessing as mp
 import importlib.util
 import numpy as np
 import time
@@ -9,6 +9,8 @@ import os
 import traceback
 import torch
 from liger_kernel.ops.layer_norm import LigerLayerNormFunction as ReferenceLayerNorm
+
+mp.set_start_method('spawn', force=True)
 
 def _load_program(program_path):
     spec = importlib.util.spec_from_file_location("program", program_path)
