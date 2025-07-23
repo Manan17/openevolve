@@ -7,6 +7,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 import anthropic
+import httpx
 
 from openevolve.llm.base import LLMInterface
 
@@ -83,7 +84,26 @@ class AnthropicLLM(LLMInterface):
                     logger.error(f"All {retries + 1} attempts failed with timeout")
                     raise
             except Exception as e:
-                if attempt < retries:
+                # Check for HTTP 529 or 429
+                status_code = None
+                if hasattr(e, 'response') and hasattr(e.response, 'status_code'):
+                    status_code = e.response.status_code
+                elif isinstance(e, httpx.HTTPStatusError):
+                    status_code = e.response.status_code
+                # Fallback: check error string
+                is_rate_limited = (
+                    status_code in (429, 529)
+                    or "529" in str(e)
+                    or "429" in str(e)
+                )
+                if is_rate_limited:
+                    wait_time = max(retry_delay * (2 ** attempt), 10)  # Exponential backoff, min 10s
+                    logger.warning(
+                        f"Rate limit (HTTP {status_code}) on attempt {attempt + 1}/{retries + 1}: {str(e)}. "
+                        f"Waiting {wait_time:.1f}s before retry..."
+                    )
+                    await asyncio.sleep(wait_time)
+                elif attempt < retries:
                     logger.warning(
                         f"Error on attempt {attempt + 1}/{retries + 1}: {str(e)}. Retrying..."
                     )
