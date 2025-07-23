@@ -10,7 +10,7 @@ llm:
     # List of available models with their weights
     - name: "claude-sonnet-4-20250514"
       weight: 0.8
-    - name: "claude-3-opus-20240229"
+    - name: "claude-3-7-sonnet-20250219"
       weight: 0.2
 
   # Models for LLM feedback
@@ -18,7 +18,7 @@ llm:
     # List of available models with their weights
     - name: "claude-sonnet-4-20250514"
       weight: 0.8
-    - name: "claude-3-opus-20240229"
+    - name: "claude-3-7-sonnet-20250219"
       weight: 0.2
 
   # API configuration
