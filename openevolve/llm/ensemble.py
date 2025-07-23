@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Tuple
 
 from openevolve.llm.base import LLMInterface
 from openevolve.llm.openai import OpenAILLM
+from openevolve.llm.anthropic import AnthropicLLM  # NEW: Import AnthropicLLM
 from openevolve.config import LLMModelConfig
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,15 @@ class LLMEnsemble:
         self.models_cfg = models_cfg
 
         # Initialize models from the configuration
-        self.models = [OpenAILLM(model_cfg) for model_cfg in models_cfg]
+        self.models = []
+        for model_cfg in models_cfg:
+            # Detect Anthropic models by api_base or model name
+            if (model_cfg.api_base and "anthropic" in model_cfg.api_base) or (
+                model_cfg.name and model_cfg.name.startswith("claude")
+            ):
+                self.models.append(AnthropicLLM(model_cfg))
+            else:
+                self.models.append(OpenAILLM(model_cfg))
 
         # Extract and normalize model weights
         self.weights = [model.weight for model in models_cfg]
