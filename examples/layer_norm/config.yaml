@@ -20,10 +20,10 @@ llm:
   models:
     - name: "Qwen/Qwen2.5-Coder-32B-Instruct"
       weight: 1.0
+      top_k: 20
   temperature: 0.9
   top_p: 0.8
-  max_tokens: 80
-  top_k: 20
+  max_tokens: 20000
 
   # API configuration
   api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"  # Base URL for API (change for non-OpenAI models)
