@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Tuple
 from openevolve.llm.base import LLMInterface
 from openevolve.llm.openai import OpenAILLM
 from openevolve.llm.anthropic import AnthropicLLM  # NEW: Import AnthropicLLM
+from openevolve.llm.vllm import VLLMLLM  # NEW: Import VLLMLLM
 from openevolve.config import LLMModelConfig
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,11 @@ class LLMEnsemble:
                 model_cfg.name and model_cfg.name.startswith("claude")
             ):
                 self.models.append(AnthropicLLM(model_cfg))
+            # Detect vLLM/Qwen models by api_base or model name
+            elif (model_cfg.api_base and "vllm" in model_cfg.api_base) or (
+                model_cfg.name and "Qwen" in model_cfg.name
+            ):
+                self.models.append(VLLMLLM(model_cfg))
             else:
                 self.models.append(OpenAILLM(model_cfg))
 

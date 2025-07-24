@@ -3,7 +3,7 @@
 # You can use this as a template for your own configuration
 
 # General settings
-max_iterations: 100                  # Maximum number of evolution iterations
+max_iterations: 200                  # Maximum number of evolution iterations
 checkpoint_interval: 10               # Save checkpoints every N iterations
 log_level: "INFO"                     # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 log_dir: null                         # Custom directory for logs (default: output_dir/logs)
@@ -15,21 +15,15 @@ max_code_length: 1000000                # Maximum allowed code length in charact
 
 # LLM configuration
 llm:
-  # Models for evolution
+  api_base: "http://localhost:8000/v1"
+  api_key: null
   models:
-    # List of available models with their weights
-    - name: "gemini-2.0-flash-lite"
-      weight: 0.8
-    - name: "gemini-2.0-flash"
-      weight: 0.2
-
-  # Models for LLM feedback
-  evaluator_models:
-    # List of available models with their weights
-    - name: "gemini-2.0-flash-lite"
-      weight: 0.8
-    - name: "gemini-2.0-flash"
-      weight: 0.2
+    - name: "Qwen/Qwen2.5-Coder-32B-Instruct"
+      weight: 1.0
+  temperature: 0.9
+  top_p: 0.8
+  max_tokens: 80
+  top_k: 20
 
   # API configuration
   api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"  # Base URL for API (change for non-OpenAI models)
