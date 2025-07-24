@@ -20,7 +20,6 @@ llm:
   models:
     - name: "Qwen/Qwen2.5-Coder-32B-Instruct"
       weight: 1.0
-      top_k: 20
   temperature: 0.9
   top_p: 0.8
   max_tokens: 20000

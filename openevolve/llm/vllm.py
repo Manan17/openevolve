@@ -14,7 +14,6 @@ class VLLMLLM(LLMInterface):
         self.temperature = getattr(model_cfg, "temperature", 0.9)
         self.top_p = getattr(model_cfg, "top_p", 0.8)
         self.max_tokens = getattr(model_cfg, "max_tokens", 80)
-        self.top_k = getattr(model_cfg, "top_k", 20)
         self.retries = getattr(model_cfg, "retries", 3)
         self.retry_delay = getattr(model_cfg, "retry_delay", 5)
 
@@ -35,7 +34,6 @@ class VLLMLLM(LLMInterface):
             "model": self.model,
             "prompt": [prompt],
             "max_tokens": kwargs.get("max_tokens", self.max_tokens),
-            "top_k": kwargs.get("top_k", self.top_k),
             "top_p": kwargs.get("top_p", self.top_p),
             "temperature": kwargs.get("temperature", self.temperature),
         }
