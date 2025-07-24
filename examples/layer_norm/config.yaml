@@ -18,7 +18,7 @@ llm:
   api_base: "http://localhost:8000/v1"
   api_key: null
   models:
-    - name: "Qwen/Qwen3-8B"
+    - name: "Qwen/Qwen3-4B"
       weight: 1.0
   temperature: 0.9
   top_p: 0.8
