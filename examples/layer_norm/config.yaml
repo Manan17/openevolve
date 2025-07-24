@@ -11,7 +11,7 @@ random_seed: 42                       # Random seed for reproducibility (null = 
 
 # Evolution settings
 diff_based_evolution: true            # Use diff-based evolution (true) or full rewrites (false)
-max_code_length: 1000000                # Maximum allowed code length in characters
+max_code_length: 20000                # Maximum allowed code length in characters
 
 # LLM configuration
 llm:
@@ -22,9 +22,10 @@ llm:
       weight: 1.0
   temperature: 0.9
   top_p: 0.8
+  max_tokens: 3000
 
   # Request parameters
-  timeout: 60                         # Timeout for API requests in seconds
+  timeout: 3600                         # Timeout for API requests in seconds
   retries: 3                          # Number of retries for failed requests
   retry_delay: 5                      # Delay between retries in seconds
 
