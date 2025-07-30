@@ -19,11 +19,12 @@ from liger_kernel.ops.fused_linear_jsd import LigerFusedLinearJSDFunction as Ref
 import concurrent.futures
 import threading
 from torch.profiler import profile, record_function, ProfilerActivity
+import multiprocessing as mp
 
 # Load environment variables from .env file
 load_dotenv()
 
-
+mp.set_start_method('spawn', force=True)
 
 class TimeoutError(Exception):
     pass
