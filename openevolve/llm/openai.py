@@ -102,10 +102,8 @@ class OpenAILLM(LLMInterface):
             if self.api_base == "https://generativelanguage.googleapis.com/v1beta/openai/" or (
                 self.api_base and "dashscope" in self.api_base
             ):
-                logger.warning(
-                    "Skipping seed parameter as Google AI Studio endpoint doesn't support it. "
-                    "Reproducibility may be limited."
-                )
+                logger.warning("no seed")
+                print(self.api_base)
             else:
                 params["seed"] = seed
 
