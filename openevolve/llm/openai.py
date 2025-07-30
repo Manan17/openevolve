@@ -99,9 +99,7 @@ class OpenAILLM(LLMInterface):
         seed = kwargs.get("seed", self.random_seed)
         if seed is not None:
             # Some OpenAI-compatible providers (e.g., Google AI Studio, DashScope) don't support the `seed` parameter.
-            if self.api_base == "https://generativelanguage.googleapis.com/v1beta/openai/" or (
-                self.api_base and "dashscope" in self.api_base
-            ):
+            if (self.api_base and "dashscope" in self.api_base):
                 logger.warning("no seed")
                 print(self.api_base)
             else:
