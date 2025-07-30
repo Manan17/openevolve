@@ -31,7 +31,20 @@ class OpenAILLM(LLMInterface):
         self.retries = model_cfg.retries
         self.retry_delay = model_cfg.retry_delay
         self.api_base = model_cfg.api_base
+        # Determine API key based on provided configuration or environment variables.
+        # For Aliyun DashScope endpoints, fall back to `DASHSCOPE_API_KEY` if no key is explicitly set.
         self.api_key = model_cfg.api_key
+        if (self.api_key is None or self.api_key == "") and model_cfg.api_base and "dashscope" in model_cfg.api_base:
+            import os
+
+            self.api_key = os.getenv("DASHSCOPE_API_KEY")
+
+            if not self.api_key:
+                logger.warning(
+                    "DashScope base URL detected but no API key provided. "
+                    "Please set the `api_key` in the LLM configuration or export the "
+                    "`DASHSCOPE_API_KEY` environment variable."
+                )
         self.random_seed = getattr(model_cfg, "random_seed", None)
 
         # Set up API client
@@ -85,7 +98,10 @@ class OpenAILLM(LLMInterface):
         # Skip seed parameter for Google AI Studio endpoint as it doesn't support it
         seed = kwargs.get("seed", self.random_seed)
         if seed is not None:
-            if self.api_base == "https://generativelanguage.googleapis.com/v1beta/openai/":
+            # Some OpenAI-compatible providers (e.g., Google AI Studio, DashScope) don't support the `seed` parameter.
+            if self.api_base == "https://generativelanguage.googleapis.com/v1beta/openai/" or (
+                self.api_base and "dashscope" in self.api_base
+            ):
                 logger.warning(
                     "Skipping seed parameter as Google AI Studio endpoint doesn't support it. "
                     "Reproducibility may be limited."

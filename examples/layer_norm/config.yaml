@@ -15,20 +15,20 @@ max_code_length: 20000                # Maximum allowed code length in character
 
 # LLM configuration
 llm:
-  api_base: "http://localhost:8000/v1"
+  api_base: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
   api_key: null
   models:
-    - name: "Qwen/Qwen3-4B"
+    - name: "qwen3-coder-plus"
       weight: 1.0
   evaluator_models:
-    - name: "Qwen/Qwen3-4B"
+    - name: "qwen3-coder-plus"
       weight: 1.0
   temperature: 0.8
   top_p: 0.8
   max_tokens: 3000
 
   # Request parameters
-  timeout: 7000                         # Timeout for API requests in seconds
+  timeout: 3000                         # Timeout for API requests in seconds
   retries: 3                          # Number of retries for failed requests
   retry_delay: 5                      # Delay between retries in seconds
 
