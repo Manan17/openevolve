@@ -171,7 +171,9 @@ class PromptSampler:
         improvement_areas = []
 
         # Check program length
-        if len(current_program) > 500:
+        # Support both old and new parameter names for backward compatibility
+        threshold = self.config.suggest_simplification_after_chars or self.config.code_length_threshold
+        if threshold and len(current_program) > threshold:
             improvement_areas.append(
                 "Consider simplifying the code to improve readability and maintainability"
             )
@@ -309,11 +311,8 @@ class PromptSampler:
         selected_top = top_programs[: min(self.config.num_top_programs, len(top_programs))]
 
         for i, program in enumerate(selected_top):
-            # Extract a snippet (first 10 lines) for display
+            # Use the full program code
             program_code = program.get("code", "")
-            program_snippet = "\n".join(program_code.split("\n")[:10])
-            if len(program_code.split("\n")) > 10:
-                program_snippet += "\n# ... (truncated for brevity)"
 
             # Calculate a composite score using safe numeric average
             score = safe_numeric_average(program.get("metrics", {}))
@@ -338,7 +337,7 @@ class PromptSampler:
                     program_number=i + 1,
                     score=f"{score:.4f}",
                     language=language,
-                    program_snippet=program_snippet,
+                    program_snippet=program_code,
                     key_features=key_features_str,
                 )
                 + "\n\n"
@@ -362,11 +361,8 @@ class PromptSampler:
                 diverse_programs_str += "\n\n## Diverse Programs\n\n"
 
                 for i, program in enumerate(diverse_programs):
-                    # Extract a snippet (first 5 lines for diversity)
+                    # Use the full program code
                     program_code = program.get("code", "")
-                    program_snippet = "\n".join(program_code.split("\n")[:5])
-                    if len(program_code.split("\n")) > 5:
-                        program_snippet += "\n# ... (truncated)"
 
                     # Calculate a composite score using safe numeric average
                     score = safe_numeric_average(program.get("metrics", {}))
@@ -388,7 +384,7 @@ class PromptSampler:
                             program_number=f"D{i + 1}",
                             score=f"{score:.4f}",
                             language=language,
-                            program_snippet=program_snippet,
+                            program_snippet=program_code,
                             key_features=key_features_str,
                         )
                         + "\n\n"
@@ -430,11 +426,8 @@ class PromptSampler:
         inspiration_programs_str = ""
 
         for i, program in enumerate(inspirations):
-            # Extract a snippet (first 8 lines) for display
+            # Use the full program code
             program_code = program.get("code", "")
-            program_snippet = "\n".join(program_code.split("\n")[:8])
-            if len(program_code.split("\n")) > 8:
-                program_snippet += "\n# ... (truncated for brevity)"
 
             # Calculate a composite score using safe numeric average
             score = safe_numeric_average(program.get("metrics", {}))
@@ -451,7 +444,7 @@ class PromptSampler:
                     score=f"{score:.4f}",
                     program_type=program_type,
                     language=language,
-                    program_snippet=program_snippet,
+                    program_snippet=program_code,
                     unique_features=unique_features,
                 )
                 + "\n\n"
@@ -508,7 +501,7 @@ class PromptSampler:
         metadata = program.get("metadata", {})
         if "changes" in metadata:
             changes = metadata["changes"]
-            if isinstance(changes, str) and len(changes) < 100:
+            if isinstance(changes, str) and self.config.include_changes_under_chars and len(changes) < self.config.include_changes_under_chars:
                 features.append(f"Modification: {changes}")
 
         # Analyze metrics for standout characteristics
@@ -530,9 +523,9 @@ class PromptSampler:
                 features.append("NumPy-based implementation")
             if "for" in code_lower and "while" in code_lower:
                 features.append("Mixed iteration strategies")
-            if len(code.split("\n")) < 10:
+            if self.config.concise_implementation_max_lines and len(code.split("\n")) <= self.config.concise_implementation_max_lines:
                 features.append("Concise implementation")
-            elif len(code.split("\n")) > 50:
+            elif self.config.comprehensive_implementation_min_lines and len(code.split("\n")) >= self.config.comprehensive_implementation_min_lines:
                 features.append("Comprehensive implementation")
 
         # Default if no specific features found
@@ -540,7 +533,9 @@ class PromptSampler:
             program_type = self._determine_program_type(program)
             features.append(f"{program_type} approach to the problem")
 
-        return ", ".join(features[:3])  # Limit to top 3 features
+        # Use num_top_programs as limit for features (similar to how we limit programs)
+        feature_limit = self.config.num_top_programs
+        return ", ".join(features[:feature_limit])
 
     def _apply_template_variations(self, template: str) -> str:
         """Apply stochastic variations to the template"""
