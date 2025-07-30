@@ -21,9 +21,7 @@ import threading
 # Load environment variables from .env file
 load_dotenv()
 
-# # Verify OpenAI API key is set
-if not os.getenv('OPENAI_API_KEY'):
-    raise ValueError("OPENAI_API_KEY not found in environment variables. Please set it in .env file.")
+
 
 class TimeoutError(Exception):
     pass
