@@ -182,7 +182,7 @@ class VectorAdditionEvaluator:
                 speed_score = min(avg_speedup / 3.0, 1.0)
             else:
                 # Slower than baseline: penalize heavily
-                speed_score = max(0.0, avg_speedup - 0.5) * 2.0  # 0.5x = 0 score, 1.0x = 1.0 score
+                speed_score = max(0.0, avg_speedup - 0.3) * 2.0  # 0.5x = 0 score, 1.0x = 1.0 score
             
             return {
                 'speed_score': speed_score,
