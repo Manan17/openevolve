@@ -20,8 +20,8 @@ import psutil
 import gc
 from typing import Dict, Any, Tuple, Optional
 import concurrent.futures
-import multiprocessing as mp
-mp.set_start_method('spawn', force=True)
+
+
 class VectorAdditionEvaluator:
     """Comprehensive evaluator for Triton vector addition kernels"""
     
@@ -174,7 +174,13 @@ class VectorAdditionEvaluator:
                     speedup_scores.append(min(speedup, 10.0))  # Cap at 10x speedup
             
             avg_speedup = np.mean(speedup_scores) if speedup_scores else 1.0
-            speed_score = min(avg_speedup / 5.0, 1.0)  # Normalize to 0-1
+            # More sensitive scoring: penalize slow kernels more heavily
+            if avg_speedup >= 1.0:
+                # Faster than baseline: reward
+                speed_score = min(avg_speedup / 3.0, 1.0)
+            else:
+                # Slower than baseline: penalize heavily
+                speed_score = max(0.0, avg_speedup - 0.5) * 2.0  # 0.5x = 0 score, 1.0x = 1.0 score
             
             return {
                 'speed_score': speed_score,
@@ -413,15 +419,23 @@ def evaluate_stage2(program_path: str) -> Dict[str, Any]:
             robustness_result.get('robustness_score', 0.0) * 0.4
         )
         
+        # Calculate combined score for stage 2
+        # Weight: 70% performance, 30% robustness (emphasize performance more)
+        combined_score = (
+            performance_result.get('speed_score', 0.0) * 0.7 +
+            robustness_result.get('robustness_score', 0.0) * 0.3
+        )
+        
         return {
             'stage2_score': stage2_score,
             'speed_score': performance_result.get('speed_score', 0.0),
             'robustness_score': robustness_result.get('robustness_score', 0.0),
-            'avg_speedup': performance_result.get('avg_speedup', 1.0)
+            'avg_speedup': performance_result.get('avg_speedup', 1.0),
+            'combined_score': combined_score
         }
         
     except Exception as e:
-        return {'stage2_score': 0.0, 'error': f'Stage 2 evaluation failed: {str(e)}'}
+        return {'stage2_score': 0.0, 'combined_score': 0.0, 'error': f'Stage 2 evaluation failed: {str(e)}'}
 
 
 if __name__ == "__main__":
