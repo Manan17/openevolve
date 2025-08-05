@@ -20,8 +20,8 @@ import psutil
 import gc
 from typing import Dict, Any, Tuple, Optional
 import concurrent.futures
-
-
+import multiprocessing as mp
+mp.set_start_method('spawn', force=True)
 class VectorAdditionEvaluator:
     """Comprehensive evaluator for Triton vector addition kernels"""
     
@@ -364,22 +364,26 @@ def evaluate_stage1(program_path: str) -> Dict[str, Any]:
         
         # Check basic functionality
         if not hasattr(program, 'vector_add'):
-            return {'stage1_score': 0.0, 'error': 'Missing vector_add function'}
+            return {'stage1_score': 0.0, 'combined_score': 0.0, 'error': 'Missing vector_add function'}
         
         if not hasattr(program, 'add_kernel'):
-            return {'stage1_score': 0.0, 'error': 'Missing add_kernel function'}
+            return {'stage1_score': 0.0, 'combined_score': 0.0, 'error': 'Missing add_kernel function'}
         
         # Test basic correctness
         correctness_result = evaluator._test_correctness(program)
         stage1_score = correctness_result.get('correctness_score', 0.0)
         
+        # For stage 1, combined score is just the correctness score
+        combined_score = stage1_score
+        
         return {
             'stage1_score': stage1_score,
-            'correctness_score': stage1_score
+            'correctness_score': stage1_score,
+            'combined_score': combined_score
         }
         
     except Exception as e:
-        return {'stage1_score': 0.0, 'error': f'Stage 1 evaluation failed: {str(e)}'}
+        return {'stage1_score': 0.0, 'combined_score': 0.0, 'error': f'Stage 1 evaluation failed: {str(e)}'}
 
 
 def evaluate_stage2(program_path: str) -> Dict[str, Any]:
