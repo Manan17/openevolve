@@ -20,6 +20,8 @@ import psutil
 import gc
 from typing import Dict, Any, Tuple, Optional
 import concurrent.futures
+import multiprocessing as mp
+mp.set_start_method('spawn', force=True)
 
 
 class VectorAdditionEvaluator:
